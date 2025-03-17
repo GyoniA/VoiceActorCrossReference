@@ -1,4 +1,3 @@
-import requests
 import yaml
 import tmdbsimple as tmdb
 
@@ -18,40 +17,21 @@ def get_actor_filmography(actor_name: str = None, actor_id=None):
     :return: a list of tuples containing the title, role, and year of the film/TV show.
     """
     if actor_id is None:
-        search_url = f"{tmdb_base_url}/search/person"
-
-        params = {
-            "api_key": api_key,
-            "query": actor_name,
-        }
-
-        response = requests.get(search_url, params=params)
-        if response.status_code != 200:
-            print("Error fetching data from TMDb API")
-            return None
-
-        data = response.json()
-        if "results" not in data or not data["results"]:
+        response = tmdb.Search().person(query=actor_name)
+        if not response["results"]:
             print("No actor found")
             return None
-        actor_id = data["results"][0]["id"]
+        actor_id = response["results"][0]["id"]
 
-    filmography_url = f"{tmdb_base_url}/person/{actor_id}/combined_credits"
-
-    response = requests.get(filmography_url, params={"api_key": api_key})
-    if response.status_code != 200:
-        print("Error fetching filmography")
-        return None
-
-    filmography_data = response.json()
+    person = tmdb.People(actor_id)
+    credits = person.combined_credits()
     filmography = []
 
-    for item in filmography_data.get("cast", []):
+    for item in credits.get("cast", []):
         title = item.get("title") or item.get("name", "Unknown Title")
         year = item.get("release_date") or item.get("first_air_date", "Unknown Year")
         role = item.get("character")
         filmography.append((title, role, year))
-
     return filmography
 
 
@@ -63,40 +43,22 @@ def find_actor_by_role(title: str, role: str, is_movie=False):
     :param is_movie: Whether to search for movies.
     :return: The actor's name, and id.
     """
-    search_url = f"{tmdb_base_url}/search/movie" if is_movie else f"{tmdb_base_url}/search/tv"
-
-    params = {
-        "api_key": api_key,
-        "query": title,
-    }
-
-    response = requests.get(search_url, params=params)
-    if response.status_code != 200:
-        print("Error fetching data from TMDb API")
-        return None
-
-    data = response.json()
-    if "results" not in data or not data["results"]:
+    search = tmdb.Search()
+    response = search.movie(query=title) if is_movie else search.tv(query=title)
+    if not response["results"]:
         print("No show found")
         return None
 
-    if is_movie:
-        sorted_results = sorted(data["results"], key=lambda res: res["release_date"], reverse=True)
-    else:
-        sorted_results = sorted(data["results"], key=lambda res: res["first_air_date"], reverse=True)
+    sorted_results = sorted(response["results"], key=lambda res: res.get("release_date" if is_movie else "first_air_date", ""),
+                            reverse=True)
     show_id = sorted_results[0]["id"]
-    credits_url = f"{tmdb_base_url}/movie/{show_id}/credits" if is_movie else f"{tmdb_base_url}/tv/{show_id}/credits"
 
-    response = requests.get(credits_url, params={"api_key": api_key})
-    if response.status_code != 200:
-        print("Error fetching credits")
-        return None
+    credits = tmdb.Movies(show_id).credits() if is_movie else tmdb.TV(show_id).credits()
 
-    credits_data = response.json()
     role_lower = role.lower()
-    for item in credits_data.get("cast", []):
+    for item in credits.get("cast", []):
         character = item.get("character")
-        if character == role or role_lower in character.lower():
+        if character and (character == role or role_lower in character.lower()):
             return item.get("name"), item.get("id")
 
     return None, None
@@ -112,7 +74,7 @@ if __name__ == "__main__":
         for actor_title, actor_role, actor_year in entries:
             print(f"{actor_title} ({actor_year}) - {actor_role}")
 
-    role = "Toji"
+    role = "Toji Fushiguro"
     show = "Jujutsu Kaisen"
 
     actor, a_id = find_actor_by_role(show, role, is_movie=False)
