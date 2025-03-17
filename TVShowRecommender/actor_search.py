@@ -1,6 +1,9 @@
 import requests
 import yaml
 import tmdbsimple as tmdb
+import logging
+
+logger = logging.getLogger(__name__)
 
 with open('config.yaml', 'r') as stream:
     config = yaml.safe_load(stream)
@@ -20,7 +23,7 @@ def get_actor_filmography(actor_name: str = None, actor_id=None):
     if actor_id is None:
         response = tmdb.Search().person(query=actor_name)
         if not response["results"]:
-            print("No actor found")
+            logger.error(f"No actor found for name: {actor_name}, ID: {actor_id}")
             return None
         actor_id = response["results"][0]["id"]
 
@@ -47,7 +50,7 @@ def find_actor_by_role(title: str, role: str, is_movie=False):
     search = tmdb.Search()
     response = search.movie(query=title) if is_movie else search.tv(query=title)
     if not response["results"]:
-        print("No show found")
+        logger.error(f"No show found for title: {title}, role: {role}, is_movie: {is_movie}")
         return None
 
     sorted_results = sorted(response["results"], key=lambda res: res.get("release_date" if is_movie else "first_air_date", ""),
@@ -65,7 +68,7 @@ def find_actor_by_role(title: str, role: str, is_movie=False):
         credits_url = f"{tmdb_base_url}/tv/{show_id}/aggregate_credits"
         response = requests.get(credits_url, params={"api_key": api_key})
         if response.status_code != 200:
-            print("Error fetching credits")
+            logger.error(f"Error fetching credits for title: {title}, role: {role}, is_movie: {is_movie}")
             return None
         credits = response.json()
         for item in credits.get("cast", []):

@@ -1,3 +1,4 @@
 pyyaml==6.0.2
 requests==2.32.3
 tmdbsimple==2.9.1
+google-genai==1.6.0
