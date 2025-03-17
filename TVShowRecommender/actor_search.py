@@ -1,3 +1,4 @@
+import requests
 import yaml
 import tmdbsimple as tmdb
 
@@ -53,13 +54,26 @@ def find_actor_by_role(title: str, role: str, is_movie=False):
                             reverse=True)
     show_id = sorted_results[0]["id"]
 
-    credits = tmdb.Movies(show_id).credits() if is_movie else tmdb.TV(show_id).credits()
-
     role_lower = role.lower()
-    for item in credits.get("cast", []):
-        character = item.get("character")
-        if character and (character == role or role_lower in character.lower()):
-            return item.get("name"), item.get("id")
+    if is_movie:
+        credits = tmdb.Movies(show_id).credits()
+        for item in credits.get("cast", []):
+            character = item.get("character")
+            if character and (character == role or role_lower in character.lower()):
+                return item.get("name"), item.get("id")
+    else:
+        credits_url = f"{tmdb_base_url}/tv/{show_id}/aggregate_credits"
+        response = requests.get(credits_url, params={"api_key": api_key})
+        if response.status_code != 200:
+            print("Error fetching credits")
+            return None
+        credits = response.json()
+        for item in credits.get("cast", []):
+            roles = item.get("roles", [])
+            for role in roles:
+                character = role.get("character")
+                if character and (character == role or role_lower in character.lower()):
+                    return item.get("name"), item.get("id")
 
     return None, None
 
