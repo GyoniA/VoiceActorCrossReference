@@ -21,9 +21,11 @@ def find_known_shows(actor_name=None, show_title=None, role=None, ratings=None):
         ratings = load_csv_tv_ratings()
 
     known_shows = []
-    if actor_name is None:
+    if actor_name is None or actor_name == "":
         if show_title and role:
             actor_name, _ = find_actor_by_role(show_title, role, is_movie=False)
+            if actor_name is None:
+                actor_name, _ = find_actor_by_role(show_title, role, is_movie=True)
         else:
             logger.error('Either actor_name or show_title and role are required.')
             return []
@@ -31,7 +33,8 @@ def find_known_shows(actor_name=None, show_title=None, role=None, ratings=None):
         filmography = get_actor_filmography(actor_name)
         if filmography:
             known_shows = [(title, role, year) for title, role, year in filmography if title in ratings]
-
+    # Sort by release date descending
+    known_shows.sort(key=lambda x: x[2], reverse=True)
     return known_shows
 
 

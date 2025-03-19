@@ -27,6 +27,7 @@ def recommend_shows(ratings):
     sys_instructions = ("You are a helpful assistant that recommends new TV shows based on the user's preferences." +
                         "Only list the show titles." +
                         "Do not recommend shows that are already in the user's list." +
+                        "Do not give duplicates or empty values." +
                         "Only list the show titles without a - or anything preceding them, and separate them by line breaks.")
 
     try:
@@ -39,6 +40,10 @@ def recommend_shows(ratings):
         )
         recommendations = response.text.split("\n")
         recommendations = [rec.strip() for rec in recommendations]
+        # Remove duplicate values
+        recommendations = list(set(recommendations))
+        # Remove empty values
+        recommendations = [rec for rec in recommendations if rec and rec != '']
         # Remove already watched shows
         watched_shows = [title for title, score in ratings.items()]
         return [rec for rec in recommendations if rec not in watched_shows]
