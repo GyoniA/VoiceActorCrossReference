@@ -8,43 +8,41 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* Dark theme styles */
-        /*
-        body {
-            background-color: #121212;
-            color: #ffffff;
+        body { background-color: #121212; color: #ffffff; }
+        .container { background-color: #1e1e1e; padding: 20px; border-radius: 10px; }
+        .dark-mode { background-color: #292929 !important; color: white !important; }
+        .white-text { color: white !important; }
+
+        .recommend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            padding: 10px;
         }
-        .container {
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+
+        .recommend-item {
+            text-align: center;
         }
-        .input-field input, .input-field label {
-            color: #ffffff;
+
+        .recommend-item img {
+            width: 100px;
+            height: 150px;
+            border-radius: 8px;
         }
-        .input-field input:focus {
-            border-bottom: 1px solid #ea0800 !important;
-            box-shadow: 0 1px 0 0 #b30000 !important;
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
         }
-        .btn {
-            background-color: #ea1b00;
+
+        .result-text {
+            flex-grow: 1;
+            text-align: start;
         }
-        .btn:hover {
-            background-color: #b30000;
-        }
-        .collection {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: #ffffff;
-        }
-        .collection-item {
-            background-color: #252525;
-            border-bottom: 1px solid #444;
-            color: #ffffff;
-        }
-        h3, h4, h5 {
-            color: #ffffff;
-        }*/
+
+        h3, h4, h5 { color: #ffffff; }
+        .btn { background-color: #6200ea; }
     </style>
 </head>
 <body>
@@ -54,17 +52,17 @@
         <form id="search-form" class="col s12">
             <div class="row">
                 <div class="input-field col s6">
-                    <input type="text" id="actor_name" name="actor_name">
+                    <input type="text" id="actor_name" name="actor_name" class="white-text">
                     <label for="actor_name">Actor Name</label>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s6">
-                    <input type="text" id="show_title" name="show_title">
+                    <input type="text" id="show_title" name="show_title" class="white-text">
                     <label for="show_title">Show Title</label>
                 </div>
                 <div class="input-field col s6">
-                    <input type="text" id="role" name="role">
+                    <input type="text" id="role" name="role" class="white-text">
                     <label for="role">Role</label>
                 </div>
             </div>
@@ -80,7 +78,7 @@
         <div class="row center-align">
             <button id="recommend-btn" class="btn waves-effect waves-light">Get Recommendations</button>
         </div>
-        <ul id="recommendations" class="collection"></ul>
+        <div id="recommendations" class="recommend-grid"></div>
     </div>
 
     <script>
@@ -100,31 +98,30 @@
                         let resultsList = $("#results");
                         resultsList.empty();
                         data.forEach(item => {
-                            resultsList.append(`<li class="collection-item">${item}</li>`);
+                            resultsList.append(`
+                                <li class="collection-item dark-mode result-item">
+                                    <span class="result-text">${item.character} — ${item.title} (${item.year})</span>
+                                </li>
+                            `);
                         });
                     }
                 });
             });
 
             $("#recommend-btn").click(function() {
-                console.log("Recommendation button clicked");
-                $.ajax({
-                    url: "/recommend",
-                    type: "GET",
-                    success: function(data) {
-                        console.log("Received recommendations:", data);
-                        let recommendationsList = $("#recommendations");
-                        recommendationsList.empty();
-                        data.forEach(item => {
-                            recommendationsList.append(`<li class="collection-item">${item}</li>`);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Error fetching recommendations:", error);
-                        alert("Error fetching recommendations. Check console for details.");
-                    }
-                });
+        $.get("/recommend", function(data) {
+            let recommendationsList = $("#recommendations");
+            recommendationsList.empty();
+            data.forEach(item => {
+                recommendationsList.append(`
+                    <div class="recommend-item">
+                        <img src="${item.image}" class="cover-img" alt="Cover Image">
+                        <p>${item.title}</p>
+                    </div>
+                `);
             });
+        });
+    });
         });
     </script>
 
