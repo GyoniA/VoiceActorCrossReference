@@ -7,8 +7,8 @@ from TVShowRecommender.recommender import recommend_shows
 
 app = Flask(__name__)
 
-
 default_ratings = load_csv_tv_ratings()
+
 
 @app.route('/')
 def index():
@@ -34,6 +34,19 @@ def recommend():
         {"title": show, "image": get_show_cover_image(show)} for show in recommendations
     ]
     return jsonify(results)
+
+
+@app.route('/reload', methods=['POST'])
+def reload():
+    data = request.json
+    csv_url = data.get('csv_url')
+    global default_ratings
+    if not csv_url or csv_url == 'None' or csv_url == '':
+        default_ratings = load_csv_tv_ratings()
+        return jsonify({"message": "Reloaded default ratings"})
+    else:
+        default_ratings = load_csv_tv_ratings(csv_url)
+        return jsonify({"message": f"Reloaded ratings from {csv_url}"})
 
 
 if __name__ == '__main__':

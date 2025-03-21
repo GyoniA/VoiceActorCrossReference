@@ -47,6 +47,14 @@
 </head>
 <body>
     <div class="container">
+        <h5 class="center-align">Change TV Show Ratings Source</h5>
+        <div class="input-field col s8">
+            <input type="text" id="csv-source" placeholder="Ratings CSV URL">
+        </div>
+        <div class="row center-align">
+            <button id="reload-btn" class="btn waves-effect waves-light">Reload</button>
+        </div>
+
         <h3 class="center-align">Find Where You Know This Actor From</h3>
 
         <form id="search-form" class="col s12">
@@ -109,19 +117,31 @@
             });
 
             $("#recommend-btn").click(function() {
-        $.get("/recommend", function(data) {
-            let recommendationsList = $("#recommendations");
-            recommendationsList.empty();
-            data.forEach(item => {
-                recommendationsList.append(`
-                    <div class="recommend-item">
-                        <img src="${item.image}" class="cover-img" alt="Cover Image">
-                        <p>${item.title}</p>
-                    </div>
-                `);
-            });
+                $.get("/recommend", function(data) {
+                    let recommendationsList = $("#recommendations");
+                    recommendationsList.empty();
+                    data.forEach(item => {
+                        recommendationsList.append(`
+                            <div class="recommend-item">
+                                <img src="${item.image}" class="cover-img" alt="Cover Image">
+                                <p>${item.title}</p>
+                            </div>
+                        `);
+                    });
+                });
         });
-    });
+        $("#reload-btn").click(function() {
+                let csvUrl = $("#csv-source").val().trim();
+                $.ajax({
+                    url: "/reload",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ csv_url: csvUrl }),
+                    success: function(response) {
+                        alert(response.message);
+                    }
+                });
+            });
         });
     </script>
 
