@@ -5,3 +5,4 @@ google-genai==1.6.0
 pyqt6==6.8.1
 qt-material==2.14
 flask==3.1.0
+gunicorn==23.0.0
