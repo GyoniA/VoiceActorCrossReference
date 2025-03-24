@@ -144,6 +144,6 @@ if __name__ == "__main__":
 
     actor, a_id = find_actor_by_role(show, role, is_movie=False)
     print(f"{role} in {show} is played by {actor} ({a_id})")
-    print(f"Jujutsu Kaisen cover image URL {get_show_cover_image("Jujutsu Kaisen")}")
+    print(f"Jujutsu Kaisen cover image URL {get_show_cover_image('Jujutsu Kaisen')}")
     print(f"Jujutsu Kaisen Toji Fushiguro cover image URL " +
-          f"{get_character_image_google("Toji Fushiguro", "Jujutsu Kaisen")}")
+          f"{get_character_image_google('Toji Fushiguro', 'Jujutsu Kaisen')}")
