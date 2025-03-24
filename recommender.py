@@ -6,7 +6,7 @@ import logging
 
 from google.genai import types
 
-from TVShowRecommender.ratings_loader import load_csv_tv_ratings
+from ratings_loader import load_csv_tv_ratings
 
 logger = logging.getLogger(__name__)
 

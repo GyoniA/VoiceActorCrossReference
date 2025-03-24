@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 
-from TVShowRecommender.actor_search import get_show_cover_image
-from TVShowRecommender.cross_reference import find_known_shows
-from TVShowRecommender.ratings_loader import load_csv_tv_ratings
-from TVShowRecommender.recommender import recommend_shows
+from actor_search import get_show_cover_image
+from cross_reference import find_known_shows
+from ratings_loader import load_csv_tv_ratings
+from recommender import recommend_shows
 
 app = Flask(__name__, static_folder='templates')
 

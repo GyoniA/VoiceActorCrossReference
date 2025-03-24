@@ -1,7 +1,7 @@
 import logging
 
-from TVShowRecommender.actor_search import get_actor_filmography, find_actor_by_role
-from TVShowRecommender.ratings_loader import load_csv_tv_ratings
+from actor_search import get_actor_filmography, find_actor_by_role
+from ratings_loader import load_csv_tv_ratings
 
 
 logger = logging.getLogger(__name__)
