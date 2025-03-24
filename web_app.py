@@ -1,9 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 
-from actor_search import get_show_cover_image
 from cross_reference import find_known_shows
 from ratings_loader import load_csv_tv_ratings
-from recommender import recommend_shows
 
 app = Flask(__name__, static_folder='templates')
 
@@ -23,16 +21,6 @@ def search():
     role = data.get('role')
     results = find_known_shows(actor_name, show_title, role, default_ratings)
     results = [{"title": title, "character": role, "year": year} for title, role, year in results]
-    return jsonify(results)
-
-
-@app.route('/recommend', methods=['GET'])
-def recommend():
-    recommendations = recommend_shows(default_ratings)
-    # Add cover images
-    results = [
-        {"title": show, "image": get_show_cover_image(show)} for show in recommendations
-    ]
     return jsonify(results)
 
 
