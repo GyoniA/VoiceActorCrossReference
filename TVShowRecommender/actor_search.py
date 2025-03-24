@@ -1,3 +1,5 @@
+import os
+
 import requests
 import yaml
 import tmdbsimple as tmdb
@@ -5,14 +7,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-with open('config.yaml', 'r') as stream:
-    config = yaml.safe_load(stream)
-api_key = config["TMDB_API_KEY"]
+if os.path.exists('config.yaml'):
+    with open('config.yaml', 'r') as stream:
+        config = yaml.safe_load(stream)
+    api_key = config["TMDB_API_KEY"]
+    google_search_engine_api_key = config["GOOGLE_SEARCH_ENGINE_API_KEY"]
+    google_search_engine_cx = config["GOOGLE_SEARCH_ENGINE_CX"]
+else:
+    api_key = os.environ.get("TMDB_API_KEY")
+    google_search_engine_api_key = os.environ.get("GOOGLE_SEARCH_ENGINE_API_KEY")
+    google_search_engine_cx = os.environ.get("GOOGLE_SEARCH_ENGINE_CX")
+tmdb_base_url = "https://api.themoviedb.org/3"
 tmdb.API_KEY = api_key
 tmdb.REQUESTS_TIMEOUT = 5
-tmdb_base_url = "https://api.themoviedb.org/3"
-google_search_engine_api_key = config["GOOGLE_SEARCH_ENGINE_API_KEY"]
-google_search_engine_cx = config["GOOGLE_SEARCH_ENGINE_CX"]
 
 
 def get_actor_filmography(actor_name: str = None, actor_id=None):

@@ -1,13 +1,17 @@
+import os
+
 import yaml
 import pandas as pd
 import logging
 
 logger = logging.getLogger(__name__)
 
-with open('config.yaml', 'r') as stream:
-    config = yaml.safe_load(stream)
-google_sheets_url = config["GOOGLE_CSV_LINK"]
-
+if os.path.exists('config.yaml'):
+    with open('config.yaml', 'r') as stream:
+        config = yaml.safe_load(stream)
+    google_sheets_url = config["GOOGLE_CSV_LINK"]
+else:
+    google_sheets_url = os.environ.get("GOOGLE_CSV_LINK")
 
 def load_csv_tv_ratings(sheet_url=google_sheets_url):
     """

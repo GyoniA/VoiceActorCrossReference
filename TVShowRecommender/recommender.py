@@ -1,3 +1,5 @@
+import os
+
 import yaml
 from google import genai
 import logging
@@ -8,9 +10,12 @@ from TVShowRecommender.ratings_loader import load_csv_tv_ratings
 
 logger = logging.getLogger(__name__)
 
-with open('config.yaml', 'r') as stream:
-    config = yaml.safe_load(stream)
-google_ai_studio_api_key = config["GOOGLE_AI_STUDIO_API_KEY"]
+if os.path.exists('config.yaml'):
+    with open('config.yaml', 'r') as stream:
+        config = yaml.safe_load(stream)
+    google_ai_studio_api_key = config["GOOGLE_AI_STUDIO_API_KEY"]
+else:
+    google_ai_studio_api_key = os.environ.get("GOOGLE_AI_STUDIO_API_KEY")
 
 
 def recommend_shows(ratings):

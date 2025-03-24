@@ -5,7 +5,7 @@ from TVShowRecommender.cross_reference import find_known_shows
 from TVShowRecommender.ratings_loader import load_csv_tv_ratings
 from TVShowRecommender.recommender import recommend_shows
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='templates')
 
 default_ratings = load_csv_tv_ratings()
 
